@@ -34,18 +34,30 @@ function Button({ children, onClick }) {
 }
 
 function App() {
+  // add this new state (replace your initialFriends variable in FriendsList)
+const [friends, setFriends] = useState(initialFriends);
+
   const [showAddFriend, setShowAddFriend] = useState(false);
 
   function handleShowAddFriend() {
     setShowAddFriend((cur) => !cur);
   }
+  function handleAddFriend(newFriend) {
+  setFriends((friends) => [...friends, newFriend]);
+  setShowAddFriend(false);
+}
+
 
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList />
+        {/* <FriendsList />
 
-        {showAddFriend && <FormAddFriend />}
+        // {showAddFriend && <FormAddFriend />} */}
+        <FriendsList friends={friends} />
+{showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+
+
         <Button onClick={handleShowAddFriend}>
           {showAddFriend ? "Close" : "Add friend"}
         </Button>
@@ -58,8 +70,7 @@ function App() {
 
 export default App;
 
-function FriendsList() {
-  const friends = initialFriends;
+function FriendsList({ friends }) {
   return (
     <ul>
       {friends.map((friend) => (
@@ -90,24 +101,26 @@ function FriendsList() {
   );
 }
 
-function FormAddFriend() {
+function FormAddFriend({ onAddFriend }) {
   const [name, setName] = useState("");
   const [image, setImage] = useState("https://i.pravatar.cc/48?u=1");
 
   function handleSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
+  if (!name || !image) return;
 
-    const newFriend = {
-      name,
-      image,
-      balance: 0,
-      id: crypto.randomUUID(),
-    };
+  const newFriend = {
+    id: crypto.randomUUID(),
+    name,
+    image,
+    balance: 0,
+  };
 
-    console.log("New friend added:", newFriend);
-    setName("");
-    setImage("https://i.pravatar.cc/48?u=1");
-  }
+  onAddFriend(newFriend);
+  setName("");
+  setImage("https://i.pravatar.cc/48?u=1");
+}
+
 
   return (
     <form className="form-add-friend" onSubmit={handleSubmit}>
